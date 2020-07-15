@@ -3,3 +3,7 @@ venv
 *.swo
 *.swp
 *.egg-info
+__pycache__
+.coverage
+.hypothesis/
+.pytest_cache/

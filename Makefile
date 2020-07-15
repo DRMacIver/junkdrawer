@@ -11,3 +11,8 @@ venv/installed: venv/bin/python requirements.txt
 update-requirements: venv/installed
 	venv/bin/pip freeze | grep -v '# Editable ' | grep -v '^-e' > requirements.txt
 	
+
+.PHONY: test
+test: venv/installed
+	venv/bin/python -m coverage run --source=src --branch -m pytest tests/
+	venv/bin/coverage report --show-missing --fail-under=100

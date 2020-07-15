@@ -1,5 +1,6 @@
 venv/bin/python:
 	virtualenv venv
+	venv/bin/pip install -e .
 
 venv/installed: venv/bin/python requirements.txt
 	venv/bin/pip install -r requirements.txt
@@ -8,5 +9,5 @@ venv/installed: venv/bin/python requirements.txt
 
 .PHONY: update-requirements
 update-requirements: venv/installed
-	venv/bin/pip freeze > requirements.txt
+	venv/bin/pip freeze | grep -v '# Editable ' | grep -v '^-e' > requirements.txt
 	

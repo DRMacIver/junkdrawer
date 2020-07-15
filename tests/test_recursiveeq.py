@@ -94,6 +94,15 @@ def test_recurse_through_attrs():
     assert recursive_eq(a, b)
 
 
+def test_recurse_through_attrs_different_values():
+    a = Foo(1)
+    a.y = a
+    b = Foo(2)
+    b.y = b
+
+    assert not recursive_eq(a, b)
+
+
 def test_different_attrs_classes():
     a = Foo(1)
     a.y = a

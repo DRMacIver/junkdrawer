@@ -3,21 +3,23 @@ import attr
 from junkdrawer.coin import Coin, validate_weight
 
 
-@attr.s(slots=True)
-class TreeNode(object):
-    item = attr.ib()
-    weight = attr.ib()
-    total_weight = attr.ib(default=None)
-
-    own_coin = attr.ib(default=None)
-    child_coin = attr.ib(default=None)
-
-
 class Sampler(object):
+    """Implements an updatable sampler with integer weights.
+
+    Behaves like a dict except the values must be integers >= 0
+    and it has the additional sample() method which picks a random
+    key with probability proportional to its weight.
+
+    Updates and sampling are both log(n)
+    """
+
     __slots__ = ("__items_to_indices", "__tree")
 
     def __init__(self, initial=()):
         self.__items_to_indices = {}
+        # We store values in a binary tree unpacked as a list.
+        # When modifying a weight we modify up to log(n) ancestors
+        # in the tree to maintain an updated total weight.
         self.__tree = []
 
         if isinstance(initial, dict):
@@ -114,3 +116,13 @@ class Sampler(object):
             if i == 0:
                 break
             i = (i - 1) // 2
+
+
+@attr.s(slots=True)
+class TreeNode(object):
+    item = attr.ib()
+    weight = attr.ib()
+    total_weight = attr.ib(default=None)
+
+    own_coin = attr.ib(default=None)
+    child_coin = attr.ib(default=None)

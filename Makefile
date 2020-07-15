@@ -6,7 +6,6 @@ venv/installed: venv/bin/python requirements.txt
 	venv/bin/pip install -r requirements.txt
 	touch venv/installed
 
-
 .PHONY: update-requirements
 update-requirements: venv/installed
 	venv/bin/pip freeze | grep -v '# Editable ' | grep -v '^-e' > requirements.txt
@@ -14,10 +13,10 @@ update-requirements: venv/installed
 
 .PHONY: test
 test: venv/installed
-	venv/bin/python -m coverage run --source=src --branch -m pytest tests/
+	venv/bin/python -m coverage run --source=src --branch -m pytest tests/ --ff --maxfail=1
 	venv/bin/coverage report --show-missing --fail-under=100
 
 .PHONY: format
 format: venv/installed
-	venv/bin/black src
-	venv/bin/isort src
+	venv/bin/black src tests
+	venv/bin/isort src tests

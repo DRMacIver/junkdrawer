@@ -1,12 +1,13 @@
 class Coin(object):
     """Implements a weighted coin."""
+
     def __init__(self, positive, negative):
         """``positive`` and ``negative`` should be integers.
         This coin will return True with probability positive / (positive + negative),
         using O(1) expected bits.
         """
-        validate_weight(positive, 'positive')
-        validate_weight(negative, 'negative')
+        validate_weight(positive, "positive")
+        validate_weight(negative, "negative")
         if max(positive, negative) == 0:
             raise ValueError("At least one weight must be non-zero")
         self.trail = [(positive, negative)]
@@ -37,8 +38,11 @@ class Coin(object):
                 return a > b
             i += 1
 
+
 def validate_weight(weight, name):
     if not isinstance(weight, int):
-        raise TypeError(f"Expected integer for {name} but got {repr(weight)} of type {type(weight).__name__}")
+        raise TypeError(
+            f"Expected integer for {name} but got {repr(weight)} of type {type(weight).__name__}"
+        )
     if weight < 0:
         raise ValueError(f"Expected non-negative value for {name} but got {weight}")

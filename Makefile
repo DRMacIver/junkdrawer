@@ -16,3 +16,8 @@ update-requirements: venv/installed
 test: venv/installed
 	venv/bin/python -m coverage run --source=src --branch -m pytest tests/
 	venv/bin/coverage report --show-missing --fail-under=100
+
+.PHONY: format
+format: venv/installed
+	venv/bin/black src
+	venv/bin/isort src

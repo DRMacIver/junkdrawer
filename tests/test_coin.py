@@ -1,16 +1,20 @@
-
-from junkdrawer.coin import Coin
-import pytest
-
-from hypothesis import given, assume, strategies as st, settings, example
 from fractions import Fraction
 from random import Random
+
+import pytest
+
+from hypothesis import assume, example, given, settings, strategies as st
+from junkdrawer.coin import Coin
 
 
 @example(1, 3, Random(0))
 @example(1, 2, Random(0))
 @settings(report_multiple_bugs=False)
-@given(st.integers(min_value=0), st.integers(min_value=0), st.randoms(use_true_random=False))
+@given(
+    st.integers(min_value=0),
+    st.integers(min_value=0),
+    st.randoms(use_true_random=False),
+)
 def test_coins_have_right_probability_calculations(m, n, rnd):
     assume(min(m, n) > 0)
     coin = Coin(m, n)

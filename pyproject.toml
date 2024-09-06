@@ -33,6 +33,9 @@ exclude_also = [
     "def __repr__",
     "if self\\.debug",
 
+    # Don't complain about excluded lines
+    "# pragma: no cover",
+
     # Don't complain if tests don't hit defensive assertion code:
     "raise AssertionError",
     "raise NotImplementedError",
@@ -43,4 +46,5 @@ exclude_also = [
 
     # Don't complain about abstract methods, they aren't run:
     "@(abc\\.)?abstractmethod",
+    "@overload",
     ]

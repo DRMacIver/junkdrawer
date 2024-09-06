@@ -58,3 +58,10 @@ def test_remarking_1():
     p.mark({0})
     p.mark({0})
     assert sorted(map(sorted, p)) == [[0], [1]]
+
+
+def test_negative_indexes():
+    p = RefinablePartition(5)
+    p.mark({0, 1})
+    p.mark({1, 2, 3})
+    assert list(p[-1]) == list(p[len(p) - 1])

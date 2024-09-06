@@ -34,6 +34,9 @@ class SelfOrganisingList(Generic[Element]):
     def find(self, condition: Callable[[Element], bool]) -> Element:
         """Returns some value in this list such that ``condition(value)`` is
         True. If no such value exists raises ``NotFound``."""
+        if not self.__values:
+            raise NotFound()
+
         if condition(self.__values[0][1]):
             return self.__values[0][1]
 

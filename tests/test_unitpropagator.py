@@ -155,14 +155,15 @@ def test_unit_propagator_updates_watches():
     up = UnitPropagator([[-2, 3, -1]])
     assert not up.units
     up.add_unit(-3)
-    assert up.units == frozenset({-3})
+    assert up.units == {-3}
     up.add_unit(1)
-    assert up.units == frozenset({1, -2, -3})
+    assert up.units == {1, -2, -3}
 
 
 def test_add_all_as_units():
     up = UnitPropagator([[-2, 3, 1]])
-    assert up.add_units([-2, -3, 1]) == frozenset({-2, -3, 1})
+    up.add_units([-2, -3, 1])
+    assert up.units == {-2, -3, 1}
 
 
 @given(st.data())

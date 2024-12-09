@@ -1,4 +1,5 @@
 from collections import defaultdict
+from copy import deepcopy
 from typing import Iterable
 
 
@@ -15,6 +16,16 @@ class UnitPropagator:
         self.units = set()
         self.__dirty = set(range(len(clauses)))
         self.__clean_dirty_clauses()
+
+    def __copy__(self):
+        assert not self.__dirty
+        result = object.__new__(UnitPropagator)
+        result.units = set(self.units)
+        result.__clauses = self.__clauses
+        result.__watches = deepcopy(self.__watches)
+        result.__watched_by = deepcopy(self.__watched_by)
+        result.__dirty = set()
+        return result
 
     def add_units(self, units: Iterable[int]) -> None:
         assert not self.__dirty, self.__dirty

@@ -1,4 +1,4 @@
-# This file is originally part of Hypothesis, which may be found at
+# This file was originally part of Hypothesis, which may be found at
 # https://github.com/HypothesisWorks/hypothesis/
 #
 # Copyright the Hypothesis Authors.

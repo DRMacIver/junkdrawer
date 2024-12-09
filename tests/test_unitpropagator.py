@@ -11,6 +11,7 @@ from hypothesis import settings, assume
 from pysat.solvers import Glucose4
 import operator
 import pytest
+from copy import copy
 
 
 def is_satisfiable(clauses):
@@ -97,6 +98,15 @@ def possible_units(draw):
 
 @settings(report_multiple_bugs=False, suppress_health_check=list(HealthCheck))
 class UnitPropagatorMachine(RuleBasedStateMachine):
+    state_to_save = (
+        "units",
+        "neg_units",
+        "clauses_left",
+        "propagator",
+        "variables",
+        "free",
+    )
+
     @initialize(clauses=good_sat_clauses)
     def initial_clauses(self, clauses):
         self.units = set()
@@ -109,7 +119,17 @@ class UnitPropagatorMachine(RuleBasedStateMachine):
             - self.units
             - self.neg_units
         )
+        self.history = []
         self.__run_shitty_unit_propagation()
+
+    @rule()
+    def save(self):
+        self.history.append({k: copy(getattr(self, k)) for k in self.state_to_save})
+
+    @precondition(lambda self: self.history)
+    @rule()
+    def restore(self):
+        self.__dict__.update(self.history.pop())
 
     @precondition(lambda self: self.free)
     @rule(units=possible_units())
@@ -186,3 +206,11 @@ def test_any_assignment_of_unsatisfiable_clauses_is_eventually_inconsistent(data
 def test_errors_on_empty_clause():
     with pytest.raises(Inconsistent):
         UnitPropagator([[]])
+
+
+def test_unit_propagator_can_be_copied():
+    x = UnitPropagator([[1, 2]])
+    y = copy(x)
+    y.add_unit(-1)
+    assert y.units == {-1, 2}
+    assert not x.units

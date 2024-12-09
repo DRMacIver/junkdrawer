@@ -1,3 +1,6 @@
+from fractions import Fraction
+
+
 class Coin:
     """Implements a weighted coin."""
 
@@ -11,6 +14,10 @@ class Coin:
         if max(positive, negative) == 0:
             raise ValueError("At least one weight must be non-zero")
         self.trail = [(positive, negative)]
+
+    @property
+    def probability(self):
+        return Fraction(self.trail[0][0], sum(self.trail[0]))
 
     def toss(self, random):
         """Return True with the appopriate probability."""

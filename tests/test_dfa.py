@@ -102,8 +102,9 @@ def dfas(draw):
 )
 @example(
     dfa=ConcreteDFA([[], []], {0}, start=1),
-    via_repr=False,  # or any other generated value
+    via_repr=False,
 )
+@example(dfa=ConcreteDFA([[], []], {0}), via_repr=True)
 def test_canonicalised_matches_same_strings(dfa, via_repr):
     canon = dfa.canonicalise()
     note(canon)

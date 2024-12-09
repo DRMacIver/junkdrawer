@@ -1,3 +1,4 @@
+from _pytest import assertion
 from hypothesis.stateful import (
     rule,
     invariant,
@@ -5,7 +6,7 @@ from hypothesis.stateful import (
     initialize,
     precondition,
 )
-from hypothesis import given, strategies as st, settings, HealthCheck
+from hypothesis import given, strategies as st, settings, HealthCheck, example
 from drmaciver_junkdrawer.sat.unitpropagator import Inconsistent, UnitPropagator
 from hypothesis import settings, assume
 from pysat.solvers import Glucose4
@@ -186,17 +187,22 @@ def test_add_all_as_units():
     assert up.units == {-2, -3, 1}
 
 
-@given(st.data())
-def test_any_assignment_of_unsatisfiable_clauses_is_eventually_inconsistent(data):
-    clauses = data.draw(unsatisfiable_clauses())
-    variables = sorted(abs(l) for clause in clauses for l in clause)
-    signs = data.draw(
+@st.composite
+def assignment_of_unsatisfiable_clauses(draw):
+    clauses = draw(unsatisfiable_clauses())
+    variables = sorted({abs(l) for clause in clauses for l in clause})
+    signs = draw(
         st.lists(
             st.sampled_from((-1, 1)), min_size=len(variables), max_size=len(variables)
         )
     )
-    assignment = data.draw(st.permutations([s * v for s, v in zip(signs, variables)]))
+    assignment = draw(st.permutations([s * v for s, v in zip(signs, variables)]))
+    return (clauses, assignment)
 
+@given(assignment_of_unsatisfiable_clauses())
+@example(t=([[-1, -2], [1, 2], [-1, 2], [1, -2]], [-1, -2]))
+def test_any_assignment_of_unsatisfiable_clauses_is_eventually_inconsistent(t):
+    clauses, assignment = t
     with pytest.raises(Inconsistent):
         propagator = UnitPropagator(clauses)
         for v in assignment:  # pragma: no branch
@@ -214,3 +220,13 @@ def test_unit_propagator_can_be_copied():
     y.add_unit(-1)
     assert y.units == {-1, 2}
     assert not x.units
+
+
+def test_unit_propagator_errors_on_inconsistency():
+    x = UnitPropagator([[1]])
+    with pytest.raises(Inconsistent):
+        x.add_unit(-1)
+
+def test_unit_propagator_can_add_units_already_present():
+    x = UnitPropagator([[1]])
+    x.add_unit(1)

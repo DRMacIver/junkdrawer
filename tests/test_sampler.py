@@ -3,7 +3,7 @@ from random import Random
 import pytest
 
 from hypothesis import assume, example, given, settings, strategies as st
-from drmaciver_junkdrawer.sampler import Sampler
+from drmaciver_junkdrawer.sampler import TreeSampler
 
 
 @given(
@@ -12,7 +12,7 @@ from drmaciver_junkdrawer.sampler import Sampler
 )
 def test_samples_only_non_zero(weights, rnd):
     assume(sum(weights.values()) > 0)
-    sampler = Sampler(weights)
+    sampler = TreeSampler(weights)
 
     assert weights[sampler.sample(rnd)] > 0
 
@@ -22,7 +22,7 @@ def test_samples_only_non_zero(weights, rnd):
     st.randoms(use_true_random=False, note_method_calls=True),
 )
 def test_samples_only_non_zero_while_updating(weights, rnd):
-    sampler = Sampler()
+    sampler = TreeSampler()
 
     model = {}
 
@@ -40,7 +40,7 @@ def test_samples_only_non_zero_while_updating(weights, rnd):
 
 @given(st.randoms(use_true_random=True))
 def test_sample_from_single(rnd):
-    sampler = Sampler()
+    sampler = TreeSampler()
     sampler[0] = 1
     assert sampler.sample(rnd) == 0
 
@@ -52,7 +52,7 @@ def test_sample_from_single(rnd):
 )
 def test_can_delete_an_item(rnd, data, weights):
     keys = sorted(weights)
-    sampler = Sampler(weights)
+    sampler = TreeSampler(weights)
     key = data.draw(st.sampled_from(keys))
     del sampler[key]
     assert sampler.sample(rnd) != key
@@ -60,7 +60,7 @@ def test_can_delete_an_item(rnd, data, weights):
 
 def test_empty_sample_is_error():
     rnd = Random(0)
-    sampler = Sampler()
+    sampler = TreeSampler()
     with pytest.raises(IndexError):
         sampler.sample(rnd)
     sampler[1] = 1
@@ -70,7 +70,7 @@ def test_empty_sample_is_error():
 
 
 def test_non_empty_sampler_is_truthy():
-    sampler = Sampler()
+    sampler = TreeSampler()
     assert not sampler
     sampler[0] = 1
     assert sampler
@@ -80,18 +80,18 @@ def test_non_empty_sampler_is_truthy():
 
 @given(st.dictionaries(st.text(), st.integers(min_value=1)))
 def test_iterates_as_dict(weights):
-    sampler = Sampler(weights)
+    sampler = TreeSampler(weights)
     assert sorted(sampler) == sorted(weights)
     assert sorted(sampler.items()) == sorted(weights.items())
 
 
 def test_skips_zero_weights():
-    sampler = Sampler({1: 1, 2: 0, 3: 1})
+    sampler = TreeSampler({1: 1, 2: 0, 3: 1})
     assert sorted(sampler) == [1, 3]
 
 
 def test_zero_weights_are_absent():
-    sampler = Sampler()
+    sampler = TreeSampler()
     sampler[1] = 2
     assert sampler[1] == 2
     sampler[1] = 0
@@ -100,17 +100,33 @@ def test_zero_weights_are_absent():
 
 
 def test_items_not_set_are_not_in_sampler():
-    sampler = Sampler()
+    sampler = TreeSampler()
     assert 3 not in sampler
 
 
 def test_heavily_samples_from_biggest_child():
     rnd = Random()
-    sampler = Sampler()
+    sampler = TreeSampler()
     for i in range(10):
         sampler[i] = 1
 
     sampler[10] = 1000
+
+    total = 1000
+    count = 0
+    for _ in range(total):
+        if sampler.sample(rnd) == 10:
+            count += 1
+    assert count / total >= 0.9
+
+
+def test_heavily_samples_from_biggest_child_with_floats():
+    rnd = Random()
+    sampler = TreeSampler()
+    for i in range(10):
+        sampler[i] = 1.0
+
+    sampler[10] = 1000.0
 
     total = 1000
     count = 0

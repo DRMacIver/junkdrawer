@@ -1,12 +1,12 @@
 from random import Random
-from typing import Iterator
+from typing import Iterator, Any
 
 import attr
 
 from drmaciver_junkdrawer.coin import Coin, validate_weight
 
 
-class Sampler:
+class TreeSampler:
     """Implements an updatable sampler with integer weights.
 
     Behaves like a dict except the values must be integers >= 0
@@ -33,21 +33,21 @@ class Sampler:
         for i in range(len(self.__tree) - 1, -1, -1):
             self.__update_node(i)
 
-    def __getitem__(self, item: int) -> int:
+    def __getitem__(self, item) -> int:
         i = self.__items_to_indices[item]
         weight = self.__tree[i].weight
         if weight == 0:
             raise KeyError(item)
         return weight
 
-    def __setitem__(self, item: int, weight: int):
+    def __setitem__(self, item, weight):
         i = self.__set_weight(item, weight)
         self.__fix_tree(i)
 
-    def __delitem__(self, item: int):
+    def __delitem__(self, item):
         self[item] = 0
 
-    def __contains__(self, item: int) -> bool:
+    def __contains__(self, item) -> bool:
         try:
             i = self.__items_to_indices[item]
         except KeyError:
@@ -93,7 +93,8 @@ class Sampler:
                 i = j2
 
     def __set_weight(self, item, weight):
-        validate_weight(weight, "weight")
+        if weight < 0:
+            raise ValueError(f"Expected non-negative weight but got {weight} < 0")
         try:
             i = self.__items_to_indices[item]
             self.__tree[i].weight = weight
@@ -124,8 +125,8 @@ class Sampler:
 @attr.s(slots=True)
 class TreeNode:
     item: int = attr.ib()
-    weight: int = attr.ib()
-    total_weight: int | None = attr.ib(default=None)
+    weight: Any  = attr.ib()
+    total_weight: Any | None = attr.ib(default=None)
 
     own_coin: Coin | None = attr.ib(default=None)
     child_coin: Coin | None = attr.ib(default=None)

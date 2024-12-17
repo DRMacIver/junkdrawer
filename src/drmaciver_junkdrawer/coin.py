@@ -47,9 +47,5 @@ class Coin:
 
 
 def validate_weight(weight, name):
-    if not isinstance(weight, int):
-        raise TypeError(
-            f"Expected integer for {name} but got {repr(weight)} of type {type(weight).__name__}"
-        )
     if weight < 0:
         raise ValueError(f"Expected non-negative value for {name} but got {weight}")

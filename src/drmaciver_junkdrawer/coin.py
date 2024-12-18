@@ -4,7 +4,7 @@ from fractions import Fraction
 class Coin:
     """Implements a weighted coin."""
 
-    def __init__(self, positive: int, negative: int):
+    def __init__(self, positive, negative):
         """``positive`` and ``negative`` should be integers.
         This coin will return True with probability positive / (positive + negative),
         using O(1) expected bits.
@@ -17,7 +17,7 @@ class Coin:
 
     @property
     def probability(self):
-        return Fraction(self.trail[0][0], sum(self.trail[0]))
+        return Fraction(self.trail[0][0]) / Fraction(sum(self.trail[0]))
 
     def toss(self, random):
         """Return True with the appopriate probability."""

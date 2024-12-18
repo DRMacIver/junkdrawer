@@ -40,3 +40,7 @@ def test_validates_weights():
         Coin(-1, 1)
     with pytest.raises(ValueError):
         Coin(0, 0)
+
+
+def test_probability_of_float_coin_is_fraction():
+    assert Coin(0.5, 0.5).probability == Fraction(1, 2)

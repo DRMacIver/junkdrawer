@@ -1,5 +1,5 @@
 from random import Random
-from typing import Iterator, Any
+from typing import Any, Iterator
 
 import attr
 
@@ -124,7 +124,7 @@ class TreeSampler:
 @attr.s(slots=True)
 class TreeNode:
     item: int = attr.ib()
-    weight: Any  = attr.ib()
+    weight: Any = attr.ib()
     total_weight: Any | None = attr.ib(default=None)
 
     own_coin: Coin | None = attr.ib(default=None)

@@ -38,7 +38,5 @@ def test_coins_have_right_probability_calculations(m, n, rnd):
 def test_validates_weights():
     with pytest.raises(ValueError):
         Coin(-1, 1)
-    with pytest.raises(TypeError):
-        Coin(0.5, 1)  # type: ignore
     with pytest.raises(ValueError):
         Coin(0, 0)

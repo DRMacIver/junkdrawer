@@ -93,8 +93,7 @@ class TreeSampler:
                 i = j2
 
     def __set_weight(self, item, weight):
-        if weight < 0:
-            raise ValueError(f"Expected non-negative weight but got {weight} < 0")
+        validate_weight(weight, "weight")
         try:
             i = self.__items_to_indices[item]
             self.__tree[i].weight = weight

@@ -39,21 +39,21 @@ class VoseAliasSampler:
                 large.append(i)
 
         while small and large:
-            l = small.pop()
-            g = large.pop()
-            assert ps[g] >= 1 >= ps[l]
-            probabilities[l] = ps[l]
-            self._alias[l] = g
-            ps[g] = (ps[l] + ps[g]) - 1
-            if ps[g] < 1:
-                small.append(g)
+            lesser = small.pop()
+            greater = large.pop()
+            assert ps[greater] >= 1 >= ps[lesser]
+            probabilities[lesser] = ps[lesser]
+            self._alias[lesser] = greater
+            ps[greater] = (ps[lesser] + ps[greater]) - 1
+            if ps[greater] < 1:
+                small.append(greater)
             else:
-                large.append(g)
+                large.append(greater)
         for q in [small, large]:
             while q:
-                g = q.pop()
-                probabilities[g] = Fraction(1)
-                self._alias[g] = g
+                greater = q.pop()
+                probabilities[greater] = Fraction(1)
+                self._alias[greater] = greater
 
         assert None not in self._alias
         assert Fraction(-1) not in probabilities
@@ -75,4 +75,4 @@ class VoseAliasSampler:
             return self._alias[i]
 
     def __repr__(self):
-        return f"Sampler({list(zip(range(len(self._probabilities)), self._probabilities, self._alias))!r})"
+        return f"VoseAliasSampler({list(zip(range(len(self._probabilities)), self._probabilities, self._alias))!r})"

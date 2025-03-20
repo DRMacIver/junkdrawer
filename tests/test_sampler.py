@@ -1,7 +1,7 @@
 from random import Random
 
 import pytest
-
+from collections import Counter
 from hypothesis import assume, example, given, settings, strategies as st
 from drmaciver_junkdrawer.sampler import TreeSampler
 
@@ -134,3 +134,19 @@ def test_heavily_samples_from_biggest_child_with_floats():
         if sampler.sample(rnd) == 10:
             count += 1
     assert count / total >= 0.9
+
+
+def test_maintains_distribution_during_deletion():
+    counts = {"a": 1000, "b": 5000, "c": 4000}
+    values = [k for k, v in counts.items() for _ in range(v)]
+    weights = [1.0 / counts[k] for k in values]
+
+    results = Counter()
+    sampler = TreeSampler(enumerate(weights))
+    random = Random(0)
+    for _ in range(1000):
+        i = sampler.sample(random)
+        sampler[i] = 0
+        results[values[i]] += 1
+    for s in "abc":
+        assert results[s] >= 200

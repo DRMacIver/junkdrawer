@@ -88,6 +88,7 @@ class IntList(Sequence[int]):
                 self.__underlying.insert(i, v)
                 return
             except OverflowError:
+                assert i <= 5
                 assert v > 0
                 self.__upgrade()
 
